@@ -1,0 +1,8 @@
+"main.obj",
+"lcd1602.obj",
+"key.obj",
+"ds18b20.obj",
+"hc-sr04.obj",
+"timer.obj" 
+TO "project" 
+RAMSIZE(256) 

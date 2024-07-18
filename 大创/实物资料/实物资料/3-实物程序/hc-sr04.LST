@@ -1,0 +1,84 @@
+C51 COMPILER V9.60.0.0   HC_SR04                                                           04/10/2024 12:13:05 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE HC_SR04
+OBJECT MODULE PLACED IN hc-sr04.OBJ
+COMPILER INVOKED BY: D:\20217972\C51\BIN\C51.EXE hc-sr04.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          /**********************************
+   2          作者：单片机俱乐部
+   3          网站：https://www.mcuclub.cn/
+   4          **********************************/
+   5          
+   6          
+   7          /**********************************
+   8          包含头文件
+   9          **********************************/
+  10          #include "hc-sr04.h"
+  11          
+  12          
+  13          /*********************************************************
+  14          函数功能：毫秒级的延时函数，time是要延时的毫秒数
+  15          传入值：time:要延时的毫秒数
+  16          返回值：无
+  17          *********************************************************/
+  18          void Hcsr04_DelayMs(uint time)
+  19          {
+  20   1        uint i,j;
+  21   1        for(i=0;i<time;i++)
+  22   1          for(j=0;j<112;j++);
+  23   1      }
+  24          
+  25          /*********************************************************
+  26          函数功能：计算测到的距离
+  27          传入值：当前的环境温度
+  28          返回值：测得的距离(距离单位cm)
+  29          *********************************************************/
+  30          uint Hcsr04_GetDistance(uint Hcsr04_temp)
+  31          {
+  32   1        uint distance;                            // 用于记录测得的距离
+  33   1        float gSpeed;                             // 保存超声波的速度值
+  34   1      
+  35   1        gSpeed = 0.607*Hcsr04_temp+331.4;         // 根据公式 v=0.607T+331.4 计算出当前温度值对应的超声波速度，这时的
+             -单位是“米/秒” 
+  36   1        gSpeed = gSpeed/10000;                    // 将超声波的速度从单位“m/s”转为“cm/us”，方便后面的计算
+  37   1      
+  38   1        TH2 = 0;                                  //如果使用了两个超声波距离传感器，则需要改成T1的HT1
+  39   1        TL2 = 0;
+  40   1      
+  41   1        HCSR04_Trig = 1;                          // 给超声波模块一个开始脉冲
+  42   1        Hcsr04_DelayMs(1);
+  43   1        HCSR04_Trig = 0;
+  44   1      
+  45   1      
+  46   1        while(!HCSR04_Echo);                      // 等待超声波模块的返回脉冲
+  47   1        TR2 = 1;                                  // 启动定时器，开始计时
+  48   1        while(HCSR04_Echo);                       // 等待超声波模块的返回脉冲结束
+  49   1        TR2 = 0;                                  // 停止定时器，停止计时
+  50   1      
+  51   1        distance=((TH2*256+TL2)*gSpeed)/2;        // 距离cm=（时间us * 速度cm/us）/2
+  52   1      
+  53   1        if(distance > 500)                        // 把检测结果限制500厘米内
+  54   1          distance = 500;
+C51 COMPILER V9.60.0.0   HC_SR04                                                           04/10/2024 12:13:05 PAGE 2   
+
+  55   1        
+  56   1        return distance;
+  57   1      }
+  58          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    169    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
